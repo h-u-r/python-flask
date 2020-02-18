@@ -1,4 +1,5 @@
-from flask import render_template, url_for, flash, redirect, request, Blueprint
+import os
+from flask import render_template, url_for, flash, redirect, request, Blueprint, current_app, send_from_directory
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_x import db, bcrypt
 from flask_x.models import User, Post
@@ -62,7 +63,7 @@ def account():
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
-    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    image_file = url_for('.user_profile', image_file=current_user.image_file)    
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form)
 
@@ -106,3 +107,7 @@ def reset_token(token):
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('users.login'))
     return render_template('reset_token.html', title='Reset Password', form=form)
+
+@users.route("/profiles/<string:image_file>", methods=['GET'])
+def user_profile(image_file):
+    return send_from_directory(os.path.join(current_app.instance_path, "profile_pics"), image_file)

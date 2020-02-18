@@ -1,5 +1,6 @@
 import os
-from flask import Flask, url_for
+import shutil
+from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
@@ -32,7 +33,9 @@ def create_app(test_config=None):
     # ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
-    except OSError:
+        os.makedirs(os.path.join(app.instance_path, "profile_pics"))
+        shutil.copy(os.path.join(app.static_folder, 'profile_default.jpg'), os.path.join(app.instance_path, "profile_pics"))
+    except OSError as e:
         pass
 
     db.init_app(app)
