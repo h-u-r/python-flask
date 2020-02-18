@@ -5,6 +5,8 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
+import click
+from flask.cli import with_appcontext
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -12,7 +14,11 @@ login_manager = LoginManager()
 login_manager.login_view = "users.login"
 login_manager.login_message_category = "info"
 mail = Mail()
-
+     
+@click.command("init-db")
+@with_appcontext
+def init_db_command():
+    db.create_all()
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -53,4 +59,6 @@ def create_app(test_config=None):
     app.register_blueprint(main)
     app.register_blueprint(errors)
     
+    app.cli.add_command(init_db_command)
+
     return app
